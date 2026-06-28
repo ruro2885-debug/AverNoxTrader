@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "AverNoxTrader"
+version = "1.0.0"
+id = "artifacts/avernox-trader"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21341
+
+[services.development]
+run = "pnpm --filter @workspace/avernox-trader run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/avernox-trader", "run", "build" ]
+publicDir = "artifacts/avernox-trader/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21341"
+BASE_PATH = "/"

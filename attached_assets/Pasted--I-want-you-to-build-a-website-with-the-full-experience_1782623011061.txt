@@ -1,0 +1,253 @@
+
+‎ ‎ I want you to build a website with the full experience of a real trading app.
+it should have a deposit button where the deposit user clicks deposit he should be required to provide a transaction code
+
+Now I want you to change the deposit system remove the old and change it to this when someone wants to deposit he should state the amount he wants to deposit and be required to provide a transaction code these code the codes are
+TXN-AX7K-9F2D-QW81-7C4E
+TXN-BR4M-3J8X-VP26-1LA9
+TXN-CK9Z-7N1F-XE84-2RW5
+TXN-DQ2H-8B6P-TM91-4YC7
+TXN-EV8L-5R3K-ZA72-9GX1
+TXN-FM1Q-4C9W-LD85-6NB2
+TXN-GX7D-2V8E-RT34-1PK9
+TXN-HZ5A-6Y2N-CF80-3QM4
+TXN-JN3T-8L7B-WX61-5RD2
+TXN-KP4F-1M9Z-VE73-8HA6
+TXN-LC8R-5Q2D-YN14-7BT3
+TXN-MW2X-7E6A-KR95-0CF8
+TXN-NF9P-3T1L-DX62-4GV7
+TXN-PR6B-8W5Q-AM30-9JK2
+TXN-QD1Y-4K8F-ZN57-6EX9
+TXN-RV7C-2P9H-LA84-1WM5
+TXN-SX5N-6D3R-QF20-8TB1
+TXN-TA9E-1V7K-CM65-4PY8
+TXN-UK4W-8B2X-JR91-5DN3
+TXN-VE6M-3F9A-XQ47-2LC8
+Once any of these codes are provided immediately fund their account with the money he wanted to deposit this codes should be reusable (don’t say anything about it in the site ) but also make it that these codes can only be reused in 44 hours (but dont state it in the site) if anyone tries to use the code twice it should say code already use until 44hours but don't say anything about the 44 hours in the site
+
+and when they deposit successfully the should  start the 7 day ai investment that will make them x2 of the money they initially deposited but it should not be directly x2 it can be a lower or higher but just make sure there is profit .
+
+ Now add a live tracker where they can see how their investing is going and how ai is working it for them they should also be able to see their deposit history .
+
+Now add a register option when the bot starts so that users can login if the mistakenly lose their account it should only be username and password and also add some visible losses to the trades to make it look real but at the end of the 7days they must get their full investment reward .
+
+ I want you to add withdraw option when users click they should be shown please confirm your Identity before you can withdraw your funds the give options proceed or decline then say contact the administration or. contact @AverAssistancebot to 
+ provide proof of your authenticity in this case any writing that is sent should be regarded as invalid only a picture should be allowed anything other than a picture should be declined .
+
+once the user is done say “how much would you like to withdraw” then the user gives the amount he wishes to withdraw then you'll give him different crypto currency to choose from and it should be in line with the real rate of the coin at that time make sure that the amount the users wants to withdraw is lower than his balance if not say insufficient balance ,and then when he clicks withdraw he should be given the option to add his wallet address after that show him a real looking transaction receipt telling him that he will receive his transaction in the next 48hours show transaction status pending then after 22 hours show the transaction status sent (don't say anything about the 22hours) then the balance he withdrew should be deducted his wallet balance then after 2 hours the balance he withdrew should be added back to their dashboard (their balance should be visible in on their dashboard) provide the receipt and the transaction status should show reversed 
+then he should be given to options Continue or See possible causes then give him some possible causes why the the money was reversed include the fact that the user used a cold wallet instead of a hot wallet ‎
+
+Users should be able to see their balance on their dashboard ‎Add a Portfolio and make it look real. give user a menu where they can see Trending assets (top gainers and losers) also add also add trade alert where the bot will provide upcoming events affecting markets 
+
+also a add Settings where users can change their username, account status, on or off trade alert, change password ( before they can change password they must put their old password if the password doesn't tally say failed to change password) the ai should make multiple trades within minutes and not one ‎ ‎Users should be give an option to refresh their live tracker and see all the trades ai is making there should be some notable losses in the trades but it must the target after 7 days the ai must trade 
+multiple stocks within every minute
+
+ add customer care in the bot and give some common issues and when the user clicks the issue it should be solve in 30 minutes (don’t state this on the bot) and add “if you still face the same issue contact @AverAssistancebot”
+
+Users should be given an option in setting to log out and another option to report a problem when they click report a problem “report your problem
+here @AverAssistancebot" 
+
+and the trade alert should be changed and updated every 24hours but don't state this in the bot
+ 
+Add our telegram bot https://t.me/AverNoxTraderbot And offer another Bitcoin and Etherum deposit option Bitcoin adress:bc1qkaw6jwev9mj65ywmy8h4rtjhdea3epvh08st03 Etherum adress :0x8372A7eAde07B979333866544696aBbc6e49DF36
+And after this payment is made the user should confirm proof of his payment by providing a transaction code
+Direct him to https://t.me/AverNoxTraderbot to get his transaction code
+
+And add some pictures to the app make it look real
+
+The top gainers and loser should be real stocks and assets that are gaining and loosing and and the trade alerts should be real time news affecting stocks in real life
+
+Now add these to make the website more realistic 
+
+2. Profit Distribution System
+
+Every profitable trade automatically splits gains based on user settings.
+
+Example:
+Profit = $1,000
+	•	50% → reinvest into trading
+	•	30% → move to reserve vault
+	•	20% → withdrawable balance
+
+Users can customize percentages.
+
+⸻
+
+3. Intelligent Compounding Engine
+
+Instead of using all account growth automatically, allow:
+	•	Conservative growth
+	•	Balanced growth
+	•	Aggressive growth
+
+Example:
+User selects 40% compounding → only 40% of profits increase future trade size.
+
+Show projected account growth.
+
+⸻
+
+4. Capital Protection Layer
+
+Protect users from overexposure.
+
+Features:
+	•	Daily loss limits
+	•	Maximum drawdown controls
+	•	Auto reduction of position size after losses
+	•	Temporary trading cooldown after volatility
+
+Dashboard should display:
+	•	Current exposure
+	•	Safety status
+	•	Risk score
+
+⸻
+
+5. Goal-Based Trading
+
+Users create goals.
+
+Examples:
+	•	Reach $500 this week
+	•	Grow account 8% monthly
+	•	Preserve capital
+
+Once goal is reached:
+	•	Continue trading
+	•	Reduce activity
+	•	Pause automatically
+
+⸻
+
+6. Automated Treasury System
+
+Create a treasury section.
+
+Money categories:
+	•	Trading Balance
+	•	Profit Reserve
+	•	Emergency Reserve
+	•	Withdrawal Balance
+	•	Historical Profit
+
+Include visual growth tracking.
+
+⸻
+
+7. Portfolio Allocation
+
+Users choose how money is divided.
+
+Example:
+Portfolio:
+	•	40% Crypto
+	•	30% Forex
+	•	20% Stocks
+	•	10% Experimental AI
+
+Allow users to adjust.
+
+⸻
+
+8. Profit Analytics
+
+Show:
+	•	Total profit
+	•	Monthly return
+	•	Average trade
+	•	Best strategy
+	•	Growth curve
+	•	Win/loss ratios
+	•	Withdrawn amount
+
+⸻
+
+9. Withdrawal & Profit Rules
+
+Add:
+	•	Manual withdrawals
+	•	Scheduled payouts
+	•	Minimum reserve requirements
+	•	Withdrawal history
+
+⸻
+
+10. AI Financial Assistant
+
+The AI explains:
+	•	Why money was allocated
+	•	Why exposure changed
+	•	Why trading slowed
+	•	How growth is happening
+
+Refer & Earn + Reward Allocation
+
+Goal
+
+Create a growth system where users invite others and earn platform rewards.
+
+How it works
+
+Each user receives:
+	•	A unique referral code
+	•	A referral link
+	•	A referral dashboard
+	•	Reward history
+	•	Reward wallet
+
+Flow:
+	1.	User shares referral link.
+	2.	New user signs up.
+	3.	Referral is tracked.
+	4.	System validates eligibility
+The referral reward should be $15
+
+Also add the users username on the dashboard instead of "Trader" and don't show expected return in the deposit center
+
+Also add the users username on the dashboard instead of "Trader" and don't show expected return in the deposit center
+
+Alright — fewer switches, but enough to feel interactive and realistic.
+
+Use this prompt:
+
+“Design AverNoxTrader settings as a realistic AI trading platform. Avoid too many ON/OFF switches—only use them where users expect direct control. Settings should feel professional and actually influence behavior.
+
+Trading
+	•	Trading Style → Conservative / Balanced / Growth (changes how selective the AI is)
+	•	Execution Mode → Assisted / Automated (Assisted suggests trades, Automated executes based on rules)
+	•	Max Active Positions → Slider (1–5) (limits simultaneous trades)
+	•	Smart Entry → ON/OFF (AI waits for better entry timing instead of immediate execution)
+
+Risk Management
+	•	Risk Level → Slider (1–10) (controls overall aggressiveness)
+	•	Stop Loss Protection → ON/OFF (automatically limits downside)
+	•	Profit Lock → ON/OFF (protects gains after reaching targets)
+	•	Capital Exposure Limit → 10–40% (maximum portfolio allocation active at once)
+
+AI Engine
+	•	Confluence Strength → Slider (2–5 confirmations) (number of factors required before entering trades)
+	•	Market Scanner → ON/OFF (continuously monitors opportunities)
+	•	AI Adaptation → Standard / Dynamic (changes behavior based on conditions)
+	•	Signal Quality → Medium / High / Strict (filters weak setups)
+
+Portfolio
+	•	Allocation Method → Fixed / Dynamic
+	•	Reserve Capital → Slider (5–20%)
+	•	Auto Rebalancing → ON/OFF (periodically adjusts allocations)
+
+User Experience
+	•	Trade Notifications → ON/OFF
+	•	Performance Reports → Daily / Weekly / Monthly
+	•	Dashboard Mode → Simple / Advanced
+
+System Indicators (display only)
+	•	Engine Status: Active
+	•	Market Status: Normal
+	•	AI Confidence: Moderate
+	•	Current Exposure: Live
+	•	Last Analysis: Real-time
+
+Make sure 
+Withdraw is possible at all times 
+Deposit  possible at all times 
