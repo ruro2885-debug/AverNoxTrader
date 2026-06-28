@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useGetUserSettings, useUpdateUserSettings, useChangePassword, useGetMe, useLogout } from "@workspace/api-client-react";
 import { useLocation } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,8 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import { Activity, ShieldAlert, Cpu, Briefcase, Bell, User, LogOut, Settings2 } from "lucide-react";
+import { Cpu, ShieldAlert, Activity, User, LogOut, ExternalLink, Lock } from "lucide-react";
 
 export default function Settings() {
   const { data: me } = useGetMe();
@@ -22,184 +20,213 @@ export default function Settings() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  const [localSettings, setLocalSettings] = useState<any>({});
+  const [local, setLocal] = useState<any>({});
   const [oldPw, setOldPw] = useState("");
   const [newPw, setNewPw] = useState("");
 
-  useEffect(() => {
-    if (settings) setLocalSettings(settings);
-  }, [settings]);
+  useEffect(() => { if (settings) setLocal(settings); }, [settings]);
 
-  const handleUpdate = (key: string, value: any) => {
-    const next = { ...localSettings, [key]: value };
-    setLocalSettings(next);
-    // Auto save
+  const update = (key: string, value: any) => {
+    const next = { ...local, [key]: value };
+    setLocal(next);
     updateSettings.mutate({ data: { [key]: value } });
   };
 
   const handlePassword = (e: React.FormEvent) => {
     e.preventDefault();
     changePassword.mutate({ data: { oldPassword: oldPw, newPassword: newPw } }, {
-      onSuccess: () => {
-        toast({ title: "Security Updated", description: "Password changed successfully." });
-        setOldPw(""); setNewPw("");
-      },
-      onError: () => {
-        toast({ title: "Failed to change password", description: "Verify your old password.", variant: "destructive" });
-      }
+      onSuccess: () => { toast({ title: "✅ Password updated" }); setOldPw(""); setNewPw(""); },
+      onError: () => toast({ title: "Incorrect current password", variant: "destructive" })
     });
   };
 
-  if (isLoading) return <div className="space-y-4"><Skeleton className="h-64" /><Skeleton className="h-64" /></div>;
+  if (isLoading) return (
+    <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}</div>
+  );
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-12">
+    <div className="space-y-5 pb-4">
       <div>
-        <h1 className="text-3xl font-sans font-bold flex items-center gap-3">
-          <Settings2 className="h-8 w-8" /> System Configuration
-        </h1>
-        <p className="text-muted-foreground">Adjust Neural Engine parameters and account settings.</p>
+        <h1 className="text-2xl font-bold">Settings</h1>
+        <p className="text-sm text-muted-foreground">Configure AI and account preferences</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* System Indicators */}
-        <Card className="col-span-1 md:col-span-4 bg-black/60 border-primary/20">
-          <CardContent className="p-4 flex flex-wrap justify-between gap-4 text-sm">
-            <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"/> Engine: <span className="font-mono text-emerald-500">Active</span></div>
-            <div className="flex items-center gap-2">Market: <span className="font-mono">Normal</span></div>
-            <div className="flex items-center gap-2">AI Confidence: <span className="font-mono text-primary">Moderate</span></div>
-            <div className="flex items-center gap-2">Exposure: <span className="font-mono">Live</span></div>
-            <div className="flex items-center gap-2 text-muted-foreground">Last Analysis: Real-time</div>
-          </CardContent>
-        </Card>
+      {/* Status Bar */}
+      <div className="bg-card border border-[#0ECB81]/20 rounded-2xl p-3 flex flex-wrap gap-4 text-xs">
+        <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#0ECB81] animate-pulse" /><span className="text-[#0ECB81] font-semibold">Engine Active</span></div>
+        <div className="flex items-center gap-1.5 text-muted-foreground">Market: <span className="text-foreground font-medium">Normal</span></div>
+        <div className="flex items-center gap-1.5 text-muted-foreground">AI Confidence: <span className="text-primary font-medium">Moderate</span></div>
+        <div className="flex items-center gap-1.5 text-muted-foreground">Mode: <span className="text-foreground font-medium">Live</span></div>
+      </div>
 
-        {/* Left Column: AI & Trading */}
-        <div className="md:col-span-2 space-y-6">
-          <Card className="bg-card/50 border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg"><Cpu className="h-5 w-5 text-primary" /> AI Engine</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between"><Label>Confluence Strength</Label><span className="font-mono text-xs">{localSettings.confluenceStrength}/5</span></div>
-                <Slider max={5} min={2} step={1} value={[localSettings.confluenceStrength || 3]} onValueChange={v => handleUpdate('confluenceStrength', v[0])} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Market Scanner</Label>
-                <Switch checked={localSettings.marketScanner} onCheckedChange={v => handleUpdate('marketScanner', v)} />
-              </div>
-              <div className="space-y-2">
-                <Label>AI Adaptation</Label>
-                <Select value={localSettings.aiAdaptation} onValueChange={v => handleUpdate('aiAdaptation', v)}>
-                  <SelectTrigger><SelectValue/></SelectTrigger>
-                  <SelectContent><SelectItem value="Standard">Standard</SelectItem><SelectItem value="Dynamic">Dynamic</SelectItem></SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Signal Quality</Label>
-                <Select value={localSettings.signalQuality} onValueChange={v => handleUpdate('signalQuality', v)}>
-                  <SelectTrigger><SelectValue/></SelectTrigger>
-                  <SelectContent><SelectItem value="Medium">Medium</SelectItem><SelectItem value="High">High</SelectItem><SelectItem value="Strict">Strict</SelectItem></SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg"><Activity className="h-5 w-5 text-emerald-500" /> Trading Execution</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-               <div className="space-y-2">
-                <Label>Style</Label>
-                <Select value={localSettings.tradingStyle} onValueChange={v => handleUpdate('tradingStyle', v)}>
-                  <SelectTrigger><SelectValue/></SelectTrigger>
-                  <SelectContent><SelectItem value="Conservative">Conservative</SelectItem><SelectItem value="Balanced">Balanced</SelectItem><SelectItem value="Growth">Growth</SelectItem></SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Execution Mode</Label>
-                <Select value={localSettings.executionMode} onValueChange={v => handleUpdate('executionMode', v)}>
-                  <SelectTrigger><SelectValue/></SelectTrigger>
-                  <SelectContent><SelectItem value="Assisted">Assisted</SelectItem><SelectItem value="Automated">Automated</SelectItem></SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-3">
-                <div className="flex justify-between"><Label>Max Active Positions</Label><span className="font-mono text-xs">{localSettings.maxActivePositions}</span></div>
-                <Slider max={5} min={1} step={1} value={[localSettings.maxActivePositions || 3]} onValueChange={v => handleUpdate('maxActivePositions', v[0])} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Smart Entry</Label>
-                <Switch checked={localSettings.smartEntry} onCheckedChange={v => handleUpdate('smartEntry', v)} />
-              </div>
-            </CardContent>
-          </Card>
+      {/* AI Engine */}
+      <div className="bg-card border border-border rounded-2xl p-4 space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border">
+          <Cpu className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-semibold">AI Engine</h2>
         </div>
 
-        {/* Right Column: Risk & Account */}
-        <div className="md:col-span-2 space-y-6">
-           <Card className="bg-card/50 border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg"><ShieldAlert className="h-5 w-5 text-rose-500" /> Risk Management</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between"><Label>Risk Level</Label><span className="font-mono text-xs">{localSettings.riskLevel}/10</span></div>
-                <Slider max={10} min={1} step={1} value={[localSettings.riskLevel || 5]} onValueChange={v => handleUpdate('riskLevel', v[0])} />
-              </div>
-               <div className="space-y-3">
-                <div className="flex justify-between"><Label>Capital Exposure Limit</Label><span className="font-mono text-xs">{localSettings.capitalExposureLimit}%</span></div>
-                <Slider max={40} min={10} step={1} value={[localSettings.capitalExposureLimit || 20]} onValueChange={v => handleUpdate('capitalExposureLimit', v[0])} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Stop Loss Protection</Label>
-                <Switch checked={localSettings.stopLossProtection} onCheckedChange={v => handleUpdate('stopLossProtection', v)} />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label>Profit Lock (Trailing)</Label>
-                <Switch checked={localSettings.profitLock} onCheckedChange={v => handleUpdate('profitLock', v)} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-card/50 border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg"><User className="h-5 w-5 text-amber-500" /> Account Identity</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label>Client ID (Username)</Label>
-                <Input readOnly value={me?.username || ""} className="bg-black/50 text-muted-foreground" />
-              </div>
-              <div className="space-y-2">
-                <Label>Account Status</Label>
-                <div className="font-mono text-emerald-500 text-sm">{me?.accountStatus || "VERIFIED"}</div>
-              </div>
-              
-              <Separator className="my-4" />
-              
-              <form onSubmit={handlePassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Change Security Key</Label>
-                  <Input type="password" placeholder="Current Password" value={oldPw} onChange={e => setOldPw(e.target.value)} required />
-                  <Input type="password" placeholder="New Password" value={newPw} onChange={e => setNewPw(e.target.value)} required />
-                </div>
-                <Button type="submit" variant="secondary" size="sm" disabled={changePassword.isPending}>Update Password</Button>
-              </form>
-
-              <Separator className="my-4" />
-
-              <div className="flex flex-col gap-3">
-                <Button variant="outline" asChild className="w-full justify-start border-primary/20 text-primary hover:bg-primary hover:text-primary-foreground">
-                  <a href="https://t.me/AverNoxTraderbot" target="_blank" rel="noreferrer">Report a Problem @AverAssistancebot</a>
-                </Button>
-                <Button variant="destructive" className="w-full justify-start" onClick={() => logout.mutate(undefined, { onSuccess: () => { localStorage.removeItem("avernox_token"); setLocation("/login"); } })}>
-                  <LogOut className="mr-2 h-4 w-4" /> Terminate Session
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="font-medium">Confluence Strength</span>
+            <span className="text-muted-foreground">{local.confluenceStrength || 3}/5</span>
+          </div>
+          <Slider max={5} min={2} step={1} value={[local.confluenceStrength || 3]} onValueChange={v => update("confluenceStrength", v[0])} />
         </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Market Scanner</p>
+            <p className="text-xs text-muted-foreground">Continuous market monitoring</p>
+          </div>
+          <Switch checked={local.marketScanner} onCheckedChange={v => update("marketScanner", v)} />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-sm">AI Adaptation</Label>
+          <Select value={local.aiAdaptation} onValueChange={v => update("aiAdaptation", v)}>
+            <SelectTrigger className="h-10 bg-muted/30 border-border rounded-xl"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="Standard">Standard</SelectItem><SelectItem value="Dynamic">Dynamic</SelectItem></SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-sm">Signal Quality</Label>
+          <Select value={local.signalQuality} onValueChange={v => update("signalQuality", v)}>
+            <SelectTrigger className="h-10 bg-muted/30 border-border rounded-xl"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Medium">Medium</SelectItem>
+              <SelectItem value="High">High</SelectItem>
+              <SelectItem value="Strict">Strict</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Trading */}
+      <div className="bg-card border border-border rounded-2xl p-4 space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border">
+          <Activity className="h-4 w-4 text-[#0ECB81]" />
+          <h2 className="text-sm font-semibold">Trading Execution</h2>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-sm">Trading Style</Label>
+          <Select value={local.tradingStyle} onValueChange={v => update("tradingStyle", v)}>
+            <SelectTrigger className="h-10 bg-muted/30 border-border rounded-xl"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Conservative">Conservative</SelectItem>
+              <SelectItem value="Balanced">Balanced</SelectItem>
+              <SelectItem value="Growth">Growth</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-sm">Execution Mode</Label>
+          <Select value={local.executionMode} onValueChange={v => update("executionMode", v)}>
+            <SelectTrigger className="h-10 bg-muted/30 border-border rounded-xl"><SelectValue /></SelectTrigger>
+            <SelectContent><SelectItem value="Assisted">Assisted</SelectItem><SelectItem value="Automated">Automated</SelectItem></SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="font-medium">Max Active Positions</span>
+            <span className="text-muted-foreground">{local.maxActivePositions || 3}</span>
+          </div>
+          <Slider max={5} min={1} step={1} value={[local.maxActivePositions || 3]} onValueChange={v => update("maxActivePositions", v[0])} />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Smart Entry</p>
+            <p className="text-xs text-muted-foreground">AI-optimized entry timing</p>
+          </div>
+          <Switch checked={local.smartEntry} onCheckedChange={v => update("smartEntry", v)} />
+        </div>
+      </div>
+
+      {/* Risk Management */}
+      <div className="bg-card border border-border rounded-2xl p-4 space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border">
+          <ShieldAlert className="h-4 w-4 text-[#F6465D]" />
+          <h2 className="text-sm font-semibold">Risk Management</h2>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="font-medium">Risk Level</span>
+            <span className={`font-bold ${(local.riskLevel || 5) <= 3 ? "text-[#0ECB81]" : (local.riskLevel || 5) <= 7 ? "text-[#F0B90B]" : "text-[#F6465D]"}`}>{local.riskLevel || 5}/10</span>
+          </div>
+          <Slider max={10} min={1} step={1} value={[local.riskLevel || 5]} onValueChange={v => update("riskLevel", v[0])} />
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs mb-1">
+            <span className="font-medium">Capital Exposure Limit</span>
+            <span className="text-muted-foreground">{local.capitalExposureLimit || 20}%</span>
+          </div>
+          <Slider max={40} min={10} step={1} value={[local.capitalExposureLimit || 20]} onValueChange={v => update("capitalExposureLimit", v[0])} />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Stop Loss Protection</p>
+            <p className="text-xs text-muted-foreground">Auto-exit at loss threshold</p>
+          </div>
+          <Switch checked={local.stopLossProtection} onCheckedChange={v => update("stopLossProtection", v)} />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Profit Lock (Trailing)</p>
+            <p className="text-xs text-muted-foreground">Lock gains as price moves up</p>
+          </div>
+          <Switch checked={local.profitLock} onCheckedChange={v => update("profitLock", v)} />
+        </div>
+      </div>
+
+      {/* Account */}
+      <div className="bg-card border border-border rounded-2xl p-4 space-y-4">
+        <div className="flex items-center gap-2 pb-2 border-b border-border">
+          <User className="h-4 w-4 text-[#F0B90B]" />
+          <h2 className="text-sm font-semibold">Account</h2>
+        </div>
+
+        <div className="flex items-center justify-between bg-muted/20 rounded-xl p-3">
+          <div>
+            <p className="text-xs text-muted-foreground">Username</p>
+            <p className="text-sm font-bold">{me?.username}</p>
+          </div>
+          <span className="text-xs bg-[#0ECB81]/15 text-[#0ECB81] px-2 py-0.5 rounded-full font-semibold">{me?.accountStatus || "Active"}</span>
+        </div>
+
+        <div className="space-y-2 pt-2 border-t border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Lock className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm font-semibold">Change Password</p>
+          </div>
+          <form onSubmit={handlePassword} className="space-y-3">
+            <Input type="password" placeholder="Current password" value={oldPw} onChange={e => setOldPw(e.target.value)} required className="h-11 bg-muted/30 border-border rounded-xl" />
+            <Input type="password" placeholder="New password" value={newPw} onChange={e => setNewPw(e.target.value)} required className="h-11 bg-muted/30 border-border rounded-xl" />
+            <Button type="submit" variant="secondary" className="w-full h-11 rounded-xl font-semibold" disabled={changePassword.isPending}>
+              {changePassword.isPending ? "Updating..." : "Update Password"}
+            </Button>
+          </form>
+        </div>
+
+        <a href="https://t.me/AverNoxTraderbot" target="_blank" rel="noreferrer" className="flex items-center justify-between bg-muted/20 rounded-xl p-3 hover:bg-muted/40 transition-colors">
+          <span className="text-sm font-medium">Report a Problem</span>
+          <ExternalLink className="h-4 w-4 text-muted-foreground" />
+        </a>
+
+        <button
+          onClick={() => logout.mutate(undefined, { onSuccess: () => { localStorage.removeItem("avernox_token"); setLocation("/login"); } })}
+          className="w-full flex items-center justify-center gap-2 py-3 bg-[#F6465D]/10 border border-[#F6465D]/20 text-[#F6465D] text-sm font-bold rounded-xl hover:bg-[#F6465D]/20 transition-colors"
+        >
+          <LogOut className="h-4 w-4" /> Sign Out
+        </button>
       </div>
     </div>
   );

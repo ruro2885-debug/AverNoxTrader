@@ -20,24 +20,22 @@ import Analytics from "@/pages/analytics";
 import Referral from "@/pages/referral";
 import Support from "@/pages/support";
 import Settings from "@/pages/settings";
+import Account from "@/pages/account";
 import { Layout } from "@/components/layout";
 
 setAuthTokenGetter(() => localStorage.getItem("avernox_token"));
 
 const queryClient = new QueryClient();
 
-function ProtectedRoute({ component: Component }: { component: any }) {
+function ProtectedRoute({ component: Component }: { component: React.ComponentType }) {
   const [location, setLocation] = useLocation();
   const token = localStorage.getItem("avernox_token");
-  
+
   useEffect(() => {
-    if (!token) {
-      setLocation("/login");
-    }
+    if (!token) setLocation("/login");
   }, [token, setLocation]);
 
   if (!token) return null;
-
   return <Component />;
 }
 
@@ -61,6 +59,7 @@ function Router() {
             <Route path="/referral" component={() => <ProtectedRoute component={Referral} />} />
             <Route path="/support" component={() => <ProtectedRoute component={Support} />} />
             <Route path="/settings" component={() => <ProtectedRoute component={Settings} />} />
+            <Route path="/account" component={() => <ProtectedRoute component={Account} />} />
             <Route component={NotFound} />
           </Switch>
         </Layout>
