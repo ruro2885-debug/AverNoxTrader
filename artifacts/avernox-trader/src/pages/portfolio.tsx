@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import { useGetPortfolio, useUpdatePortfolio, useGetTreasury, useUpdateTreasurySettings } from "@workspace/api-client-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { ShieldCheck, PieChart, TrendingUp, Zap } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PieChart, TrendingUp, Zap, ShieldCheck } from "lucide-react";
+
+const ALLOCATION_COLORS = {
+  crypto: "#F0B90B",
+  forex: "#3b82f6",
+  stocks: "#0ECB81",
+  exp: "#a855f7",
+};
 
 export default function Portfolio() {
   const { data: portfolio, isLoading: loadingPortfolio } = useGetPortfolio();
@@ -15,245 +20,181 @@ export default function Portfolio() {
   const updateTreasury = useUpdateTreasurySettings();
   const { toast } = useToast();
 
-  const [allocations, setAllocations] = useState({ crypto: 0, forex: 0, stocks: 0, exp: 0 });
-  const [dist, setDist] = useState({ reinvest: 0, reserve: 0, withdrawable: 0 });
-  const [compounding, setCompounding] = useState({ mode: 'Balanced', rate: 50 });
+  const [allocations, setAllocations] = useState({ crypto: 40, forex: 20, stocks: 30, exp: 10 });
+  const [dist, setDist] = useState({ reinvest: 40, reserve: 20, withdrawable: 40 });
+  const [compounding, setCompounding] = useState({ mode: "Balanced", rate: 50 });
 
   useEffect(() => {
-    if (portfolio) {
-      setAllocations({
-        crypto: portfolio.cryptoPercent,
-        forex: portfolio.forexPercent,
-        stocks: portfolio.stocksPercent,
-        exp: portfolio.experimentalPercent
-      });
-    }
+    if (portfolio) setAllocations({ crypto: portfolio.cryptoPercent, forex: portfolio.forexPercent, stocks: portfolio.stocksPercent, exp: portfolio.experimentalPercent });
   }, [portfolio]);
-
   useEffect(() => {
     if (treasury) {
-      setDist({
-        reinvest: treasury.reinvestPercent,
-        reserve: treasury.reservePercent,
-        withdrawable: treasury.withdrawablePercent
-      });
-      setCompounding({
-        mode: treasury.compoundingMode,
-        rate: treasury.compoundingRate
-      });
+      setDist({ reinvest: treasury.reinvestPercent, reserve: treasury.reservePercent, withdrawable: treasury.withdrawablePercent });
+      setCompounding({ mode: treasury.compoundingMode, rate: treasury.compoundingRate });
     }
   }, [treasury]);
 
-  const handleSavePortfolio = () => {
-    const total = allocations.crypto + allocations.forex + allocations.stocks + allocations.exp;
-    if (total !== 100) {
-      toast({ title: "Invalid Allocation", description: "Total allocation must equal 100%", variant: "destructive" });
-      return;
-    }
-    updatePortfolio.mutate({ data: {
-      cryptoPercent: allocations.crypto,
-      forexPercent: allocations.forex,
-      stocksPercent: allocations.stocks,
-      experimentalPercent: allocations.exp
-    }}, {
-      onSuccess: () => toast({ title: "Portfolio Updated", description: "Asset allocation algorithm synced." })
-    });
-  };
+  const total = allocations.crypto + allocations.forex + allocations.stocks + allocations.exp;
+  const distTotal = dist.reinvest + dist.reserve + dist.withdrawable;
 
-  const handleSaveTreasury = () => {
-    const total = dist.reinvest + dist.reserve + dist.withdrawable;
-    if (total !== 100) {
-      toast({ title: "Invalid Distribution", description: "Total distribution must equal 100%", variant: "destructive" });
-      return;
-    }
-    updateTreasury.mutate({ data: {
-      reinvestPercent: dist.reinvest,
-      reservePercent: dist.reserve,
-      withdrawablePercent: dist.withdrawable,
-      compoundingMode: compounding.mode,
-      compoundingRate: compounding.rate
-    }}, {
-      onSuccess: () => toast({ title: "Treasury Updated", description: "Profit distribution parameters synced." })
-    });
-  };
-
-  if (loadingPortfolio || loadingTreasury) return <div className="space-y-4"><Skeleton className="h-32" /><Skeleton className="h-64" /></div>;
+  if (loadingPortfolio || loadingTreasury) return (
+    <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-32 rounded-2xl" />)}</div>
+  );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5">
       <div>
-        <h1 className="text-3xl font-sans font-bold">Portfolio Architecture</h1>
-        <p className="text-muted-foreground">Configure AI capital allocation and risk parameters.</p>
+        <h1 className="text-2xl font-bold">Portfolio</h1>
+        <p className="text-sm text-muted-foreground">Configure AI capital allocation</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-card/50 border-border flex flex-col">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-primary" />
-              <CardTitle>Asset Allocation</CardTitle>
-            </div>
-            <CardDescription>Target distribution across market sectors</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 flex-1">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Cryptocurrency</Label>
-                  <span className="font-mono text-sm">{allocations.crypto}%</span>
-                </div>
-                <Slider 
-                  value={[allocations.crypto]} 
-                  max={100} step={1} 
-                  onValueChange={v => setAllocations(p => ({...p, crypto: v[0]}))} 
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Forex</Label>
-                  <span className="font-mono text-sm">{allocations.forex}%</span>
-                </div>
-                <Slider 
-                  value={[allocations.forex]} 
-                  max={100} step={1} 
-                  onValueChange={v => setAllocations(p => ({...p, forex: v[0]}))} 
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Equities/Stocks</Label>
-                  <span className="font-mono text-sm">{allocations.stocks}%</span>
-                </div>
-                <Slider 
-                  value={[allocations.stocks]} 
-                  max={100} step={1} 
-                  onValueChange={v => setAllocations(p => ({...p, stocks: v[0]}))} 
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label className="text-primary">Experimental AI Funds</Label>
-                  <span className="font-mono text-sm text-primary">{allocations.exp}%</span>
-                </div>
-                <Slider 
-                  value={[allocations.exp]} 
-                  max={100} step={1} 
-                  onValueChange={v => setAllocations(p => ({...p, exp: v[0]}))} 
-                />
-              </div>
-            </div>
-            
-            <div className="pt-4 border-t border-border flex items-center justify-between">
-              <div className="text-sm">
-                Total: <span className={`font-mono font-bold ${allocations.crypto + allocations.forex + allocations.stocks + allocations.exp !== 100 ? 'text-rose-500' : 'text-emerald-500'}`}>
-                  {allocations.crypto + allocations.forex + allocations.stocks + allocations.exp}%
-                </span>
-              </div>
-              <Button onClick={handleSavePortfolio} disabled={updatePortfolio.isPending}>
-                Commit Allocation
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Visual Allocation Bar */}
+      <div className="bg-card border border-border rounded-2xl p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <PieChart className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-semibold">Asset Allocation</h2>
+          <span className={`ml-auto text-xs font-bold ${total === 100 ? "text-[#0ECB81]" : "text-[#F6465D]"}`}>{total}%</span>
+        </div>
 
-        <Card className="bg-card/50 border-border flex flex-col">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-amber-500" />
-              <CardTitle>Profit Distribution</CardTitle>
-            </div>
-            <CardDescription>How generated profits are routed</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 flex-1">
-             <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Auto-Reinvest (Compounding)</Label>
-                  <span className="font-mono text-sm">{dist.reinvest}%</span>
-                </div>
-                <Slider 
-                  value={[dist.reinvest]} 
-                  max={100} step={1} 
-                  onValueChange={v => setDist(p => ({...p, reinvest: v[0]}))} 
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Emergency Reserve</Label>
-                  <span className="font-mono text-sm">{dist.reserve}%</span>
-                </div>
-                <Slider 
-                  value={[dist.reserve]} 
-                  max={100} step={1} 
-                  onValueChange={v => setDist(p => ({...p, reserve: v[0]}))} 
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Withdrawable Balance</Label>
-                  <span className="font-mono text-sm">{dist.withdrawable}%</span>
-                </div>
-                <Slider 
-                  value={[dist.withdrawable]} 
-                  max={100} step={1} 
-                  onValueChange={v => setDist(p => ({...p, withdrawable: v[0]}))} 
-                />
-              </div>
-            </div>
+        {/* Color bar */}
+        <div className="h-4 rounded-full overflow-hidden flex mb-4">
+          {[
+            { key: "crypto", label: "Crypto", val: allocations.crypto },
+            { key: "forex", label: "Forex", val: allocations.forex },
+            { key: "stocks", label: "Stocks", val: allocations.stocks },
+            { key: "exp", label: "AI Exp", val: allocations.exp },
+          ].map(({ key, val }) => (
+            <div key={key} style={{ width: `${val}%`, backgroundColor: ALLOCATION_COLORS[key as keyof typeof ALLOCATION_COLORS] }} />
+          ))}
+        </div>
 
-            <div className="space-y-4 pt-4 border-t border-border">
-              <h3 className="font-semibold flex items-center gap-2"><Zap className="h-4 w-4 text-primary" /> Compounding Engine</h3>
-              <div className="flex gap-2">
-                {['Conservative', 'Balanced', 'Aggressive'].map(mode => (
-                  <Button 
-                    key={mode} 
-                    variant={compounding.mode === mode ? 'default' : 'outline'} 
-                    className="flex-1 text-xs h-8"
-                    onClick={() => setCompounding(p => ({...p, mode}))}
-                  >
-                    {mode}
-                  </Button>
-                ))}
-              </div>
+        {/* Legend */}
+        <div className="grid grid-cols-2 gap-2 mb-5">
+          {[
+            { key: "crypto", label: "Crypto" },
+            { key: "forex", label: "Forex" },
+            { key: "stocks", label: "Stocks" },
+            { key: "exp", label: "AI Experimental" },
+          ].map(({ key, label }) => (
+            <div key={key} className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: ALLOCATION_COLORS[key as keyof typeof ALLOCATION_COLORS] }} />
+              <span className="text-xs text-muted-foreground">{label}</span>
+              <span className="ml-auto text-xs font-bold">{allocations[key as keyof typeof allocations]}%</span>
             </div>
+          ))}
+        </div>
 
-            <div className="pt-4 border-t border-border flex justify-end">
-              <Button onClick={handleSaveTreasury} disabled={updateTreasury.isPending}>
-                Update Treasury
-              </Button>
+        {/* Sliders */}
+        <div className="space-y-4">
+          {[
+            { key: "crypto" as const, label: "Cryptocurrency" },
+            { key: "forex" as const, label: "Forex" },
+            { key: "stocks" as const, label: "Equities / Stocks" },
+            { key: "exp" as const, label: "AI Experimental" },
+          ].map(({ key, label }) => (
+            <div key={key} className="space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="font-medium" style={{ color: ALLOCATION_COLORS[key] }}>{label}</span>
+                <span className="text-muted-foreground">{allocations[key]}%</span>
+              </div>
+              <Slider
+                value={[allocations[key]]}
+                max={100} step={1}
+                onValueChange={v => setAllocations(p => ({ ...p, [key]: v[0] }))}
+              />
             </div>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
+
+        <Button
+          className="w-full mt-4 rounded-xl h-11 font-bold"
+          disabled={total !== 100 || updatePortfolio.isPending}
+          onClick={() => updatePortfolio.mutate({ data: { cryptoPercent: allocations.crypto, forexPercent: allocations.forex, stocksPercent: allocations.stocks, experimentalPercent: allocations.exp } }, {
+            onSuccess: () => toast({ title: "✅ Allocation Saved" })
+          })}
+        >
+          {total !== 100 ? `Total must be 100% (currently ${total}%)` : "Save Allocation"}
+        </Button>
       </div>
 
-      <Card className="bg-black/40 border-border">
-        <CardHeader>
+      {/* Profit Distribution */}
+      <div className="bg-card border border-border rounded-2xl p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp className="h-4 w-4 text-[#F0B90B]" />
+          <h2 className="text-sm font-semibold">Profit Distribution</h2>
+          <span className={`ml-auto text-xs font-bold ${distTotal === 100 ? "text-[#0ECB81]" : "text-[#F6465D]"}`}>{distTotal}%</span>
+        </div>
+
+        <div className="space-y-4">
+          {[
+            { key: "reinvest" as const, label: "Auto-Reinvest", color: "#0ECB81" },
+            { key: "reserve" as const, label: "Emergency Reserve", color: "#F6465D" },
+            { key: "withdrawable" as const, label: "Withdrawable", color: "#3b82f6" },
+          ].map(({ key, label, color }) => (
+            <div key={key} className="space-y-2">
+              <div className="flex justify-between text-xs">
+                <span className="font-medium" style={{ color }}>{label}</span>
+                <span className="text-muted-foreground">{dist[key]}%</span>
+              </div>
+              <Slider value={[dist[key]]} max={100} step={1} onValueChange={v => setDist(p => ({ ...p, [key]: v[0] }))} />
+            </div>
+          ))}
+        </div>
+
+        {/* Compounding mode */}
+        <div className="mt-5 pt-4 border-t border-border space-y-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-emerald-500" />
-            <CardTitle>Capital Protection Layer</CardTitle>
+            <Zap className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-semibold">Compounding Mode</h3>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 bg-black/60 rounded-lg border border-border">
-              <div className="text-xs text-muted-foreground uppercase mb-1">Safety Status</div>
-              <div className="text-lg font-semibold text-emerald-500">Secure</div>
-            </div>
-            <div className="p-4 bg-black/60 rounded-lg border border-border">
-              <div className="text-xs text-muted-foreground uppercase mb-1">Risk Score</div>
-              <div className="text-lg font-semibold font-mono text-amber-500">3.4 / 10</div>
-            </div>
-            <div className="p-4 bg-black/60 rounded-lg border border-border">
-              <div className="text-xs text-muted-foreground uppercase mb-1">Daily Loss Limit</div>
-              <div className="text-lg font-semibold font-mono">-$2,500.00</div>
-            </div>
-            <div className="p-4 bg-black/60 rounded-lg border border-border">
-              <div className="text-xs text-muted-foreground uppercase mb-1">Current Exposure</div>
-              <div className="text-lg font-semibold font-mono">14.2%</div>
-            </div>
+          <div className="grid grid-cols-3 gap-2">
+            {["Conservative", "Balanced", "Aggressive"].map(mode => (
+              <button
+                key={mode}
+                onClick={() => setCompounding(p => ({ ...p, mode }))}
+                className={`py-2.5 text-xs font-bold rounded-xl border transition-colors ${
+                  compounding.mode === mode
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-muted/30 border-border text-muted-foreground hover:border-primary/40"
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <Button
+          className="w-full mt-4 rounded-xl h-11 font-bold"
+          disabled={distTotal !== 100 || updateTreasury.isPending}
+          onClick={() => updateTreasury.mutate({ data: { reinvestPercent: dist.reinvest, reservePercent: dist.reserve, withdrawablePercent: dist.withdrawable, compoundingMode: compounding.mode, compoundingRate: compounding.rate } }, {
+            onSuccess: () => toast({ title: "✅ Distribution Saved" })
+          })}
+        >
+          {distTotal !== 100 ? `Total must be 100% (currently ${distTotal}%)` : "Save Distribution"}
+        </Button>
+      </div>
+
+      {/* Capital Protection */}
+      <div className="bg-card border border-border rounded-2xl p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <ShieldCheck className="h-4 w-4 text-[#0ECB81]" />
+          <h2 className="text-sm font-semibold">Capital Protection</h2>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: "Safety Status", value: "Secure", color: "#0ECB81" },
+            { label: "Risk Score", value: "3.4 / 10", color: "#F0B90B" },
+            { label: "Daily Loss Limit", value: "-$2,500", color: "#F6465D" },
+            { label: "Current Exposure", value: "14.2%", color: "#3b82f6" },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="bg-muted/20 rounded-xl p-3">
+              <p className="text-xs text-muted-foreground mb-1">{label}</p>
+              <p className="text-sm font-bold" style={{ color }}>{value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
